@@ -1,0 +1,34 @@
+//fetch prints the content found at a addr
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+)
+
+func main() {
+	for _, addr := range os.Args[1:] {
+		if strings.HasPrefix(addr, "http://") {
+			// don't do anything
+		} else {
+			addr = "http://" + addr
+		}
+		resp, err := http.Get(addr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			os.Exit(1)
+		}
+
+		b, err := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", addr, err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s \n RETURN: %v", b, resp.Status)
+
+	}
+}
